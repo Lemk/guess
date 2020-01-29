@@ -12,11 +12,11 @@ var random = Random();
 var quantity = 0;
 
 String line(int width) {
-  var str = '';
+  var str = StringBuffer();
   for (var i = 0; i < width; i++) {
-    str += '-';
+    str.write('-');
   }
-  return str;
+  return str.toString();
 }
 
 var listGames = <String, dynamic>{};
@@ -36,7 +36,8 @@ void saveToFile(String str) {
 
 void welcome() {
   console.clearScreen();
-  console.writeLine(line(console.windowWidth));
+  var stringLine = line(console.windowWidth);
+  console.writeLine(stringLine);
   console.writeLine('');
   console.writeLine(
       'Игра "Угадай число". Программа загадует число.', TextAlignment.center);
@@ -44,11 +45,11 @@ void welcome() {
       'Необходимо угадать задуманное число за $maxGuessesTaken попыток.',
       TextAlignment.center);
   console.writeLine('');
-  console.writeLine(line(console.windowWidth));
+  console.writeLine(stringLine);
   console.writeLine('');
 }
 
-void printMessage(String str){
+void printMessage(String str) {
   console.write('Твое число ');
   console.setForegroundColor(ConsoleColor.brightYellow);
   console.write(str);
@@ -67,7 +68,8 @@ bool attempt() {
     quantity = listGames[namePlayer];
     if (quantity != null && quantity > 0) {
       console.setForegroundColor(ConsoleColor.brightGreen);
-      console.writeLine('\nС возвращение в игру $namePlayer! Количество твоих игр = $quantity. Удачи и вперед к победам!\n');
+      console.writeLine(
+          '\nС возвращение в игру $namePlayer! Количество твоих игр = $quantity. Удачи и вперед к победам!\n');
       console.resetColorAttributes();
     } else {
       quantity = 0;
@@ -88,6 +90,7 @@ bool attempt() {
       console.setForegroundColor(ConsoleColor.brightYellow);
       inputNum = console.readLine(cancelOnBreak: true);
     } while (inputNum.isEmpty || int.tryParse(inputNum) == null);
+
     num = int.parse(inputNum);
     console.resetColorAttributes();
     if (num > rndNum) {
