@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'dart:convert';
 import 'dart:math';
 import 'package:dart_console/dart_console.dart';
 
@@ -7,25 +9,51 @@ const maxGuessesTaken = 6;
 var firstGame = true;
 var namePlayer = '';
 var random = Random();
+var quantity = 0;
 
 String line(int width) {
   var str = '';
   for (var i = 0; i < width; i++) {
     str += '-';
-  };
+  }
   return str;
 }
 
+var listGames = <String, dynamic>{};
+
+String loadFromFile() {
+  /*var file = File('playerData.json');
+  return await file.readAsString();*/
+  return File('playerData.json').readAsStringSync();
+}
+
+void saveToFile(String str) {
+  var file = File('playerData.json');
+  var sink = file.openWrite();
+  sink.write(str);
+  sink.close();
+}
+
 void welcome() {
-    
-    console.clearScreen();
-    console.writeLine(line(console.windowWidth));
-    console.writeLine('');
-    console.writeLine('Игра "Угадай число". Программа загадует число.', TextAlignment.center);
-    console.writeLine('Необходимо угадать задуманное число за $maxGuessesTaken попыток.', TextAlignment.center);
-    console.writeLine('');
-    console.writeLine(line(console.windowWidth));
-    console.writeLine('');
+  console.clearScreen();
+  console.writeLine(line(console.windowWidth));
+  console.writeLine('');
+  console.writeLine(
+      'Игра "Угадай число". Программа загадует число.', TextAlignment.center);
+  console.writeLine(
+      'Необходимо угадать задуманное число за $maxGuessesTaken попыток.',
+      TextAlignment.center);
+  console.writeLine('');
+  console.writeLine(line(console.windowWidth));
+  console.writeLine('');
+}
+
+void printMessage(String str){
+  console.write('Твое число ');
+  console.setForegroundColor(ConsoleColor.brightYellow);
+  console.write(str);
+  console.resetColorAttributes();
+  console.writeLine(' загаданного!');
 }
 
 bool attempt() {
@@ -35,23 +63,39 @@ bool attempt() {
     namePlayer = console.readLine(cancelOnBreak: true);
     console.resetColorAttributes();
     firstGame = false;
+    listGames.addAll(jsonDecode(loadFromFile()));
+    quantity = listGames[namePlayer];
+    if (quantity != null && quantity > 0) {
+      console.setForegroundColor(ConsoleColor.brightGreen);
+      console.writeLine('\nС возвращение в игру $namePlayer! Количество твоих игр = $quantity. Удачи и вперед к победам!\n');
+      console.resetColorAttributes();
+    } else {
+      quantity = 0;
+    }
   }
 
   var rndNum = random.nextInt(maxNum);
   var num = 0;
-  console.writeLine('Уважаемый $namePlayer, я загадал число от 1 до ' + maxNum.toString());
+  quantity++;
+  listGames[namePlayer] = quantity;
+  console.writeLine(
+      'Уважаемый $namePlayer, я загадал число от 1 до ' + maxNum.toString());
   console.writeLine('Попробуй угадать!');
   for (var i = 0; i < maxGuessesTaken; i++) {
-    console.write('Выбери число: ');
-    console.setForegroundColor(ConsoleColor.brightYellow);
-    num = int.parse(console.readLine(cancelOnBreak: true));
+    String inputNum;
+    do {
+      console.write('Выбери число: ');
+      console.setForegroundColor(ConsoleColor.brightYellow);
+      inputNum = console.readLine(cancelOnBreak: true);
+    } while (inputNum.isEmpty || int.tryParse(inputNum) == null);
+    num = int.parse(inputNum);
     console.resetColorAttributes();
     if (num > rndNum) {
-      console.writeLine('Твое число больше загаданного!');
+      printMessage('больше');
     } else if (num < rndNum) {
-      console.writeLine('Твое число меньше загаданного!');
+      printMessage('меньше');
     } else if (num == rndNum) {
-      console.write('Отлично! $namePlayer ты справился за ${i + 1}');
+      console.write('Отлично! $namePlayer, ты справился за ${i + 1}');
       if ((i + 1) < 5) {
         console.writeLine(' попытки!');
       } else {
@@ -68,7 +112,8 @@ bool attempt() {
   console.setForegroundColor(ConsoleColor.brightYellow);
   var answer = console.readLine(cancelOnBreak: true);
   console.resetColorAttributes();
-  if (answer == 'n'){
+  if (answer == 'n') {
+    saveToFile(jsonEncode(listGames));
     return false;
   } else {
     welcome();
@@ -76,7 +121,7 @@ bool attempt() {
   }
 }
 
-void bye(){
+void bye() {
   console.setForegroundColor(ConsoleColor.brightYellow);
   console.writeLine('Bye $namePlayer!');
   console.resetColorAttributes();
