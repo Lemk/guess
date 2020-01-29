@@ -24,7 +24,12 @@ var listGames = <String, dynamic>{};
 String loadFromFile() {
   /*var file = File('playerData.json');
   return await file.readAsString();*/
-  return File('playerData.json').readAsStringSync();
+  try {
+    return File('playerData.json').readAsStringSync();
+  } on FileSystemException {
+    return '';
+  }
+
 }
 
 void saveToFile(String str) {
@@ -59,13 +64,19 @@ void printMessage(String str) {
 
 bool attempt() {
   if (firstGame) {
-    console.write('Привет! Как тебя зовут?!');
-    console.setForegroundColor(ConsoleColor.brightYellow);
-    namePlayer = console.readLine(cancelOnBreak: true);
+    do {
+      console.write('Привет! Как тебя зовут?!');
+      console.setForegroundColor(ConsoleColor.brightYellow);
+      namePlayer = console.readLine(cancelOnBreak: true);
+
+    } while (namePlayer.toString() == '');
     console.resetColorAttributes();
     firstGame = false;
-    listGames.addAll(jsonDecode(loadFromFile()));
-    quantity = listGames[namePlayer];
+    var objString = loadFromFile();
+    if (objString != '') {
+      listGames.addAll(jsonDecode(objString));
+      quantity = listGames[namePlayer];
+    }
     if (quantity != null && quantity > 0) {
       console.setForegroundColor(ConsoleColor.brightGreen);
       console.writeLine(
