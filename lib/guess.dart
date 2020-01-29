@@ -40,6 +40,7 @@ void saveToFile(String str) {
 }
 
 void welcome() {
+  console.setBackgroundColor(ConsoleColor.blue);
   console.clearScreen();
   var stringLine = line(console.windowWidth);
   console.writeLine(stringLine);
@@ -58,7 +59,7 @@ void printMessage(String str) {
   console.write('Твое число ');
   console.setForegroundColor(ConsoleColor.brightYellow);
   console.write(str);
-  console.resetColorAttributes();
+  console.setForegroundColor(ConsoleColor.brightWhite);
   console.writeLine(' загаданного!');
 }
 
@@ -70,7 +71,7 @@ bool attempt() {
       namePlayer = console.readLine(cancelOnBreak: true);
 
     } while (namePlayer.toString() == '');
-    console.resetColorAttributes();
+    console.setForegroundColor(ConsoleColor.brightWhite);
     firstGame = false;
     var objString = loadFromFile();
     if (objString != '') {
@@ -81,7 +82,7 @@ bool attempt() {
       console.setForegroundColor(ConsoleColor.brightGreen);
       console.writeLine(
           '\nС возвращение в игру $namePlayer! Количество твоих игр = $quantity. Удачи и вперед к победам!\n');
-      console.resetColorAttributes();
+      console.setForegroundColor(ConsoleColor.brightWhite);
     } else {
       quantity = 0;
     }
@@ -103,7 +104,7 @@ bool attempt() {
     } while (inputNum.isEmpty || int.tryParse(inputNum) == null);
 
     num = int.parse(inputNum);
-    console.resetColorAttributes();
+    console.setForegroundColor(ConsoleColor.brightWhite);
     if (num > rndNum) {
       printMessage('больше');
     } else if (num < rndNum) {
@@ -125,7 +126,7 @@ bool attempt() {
   console.write('Играем еще? (y/n)?');
   console.setForegroundColor(ConsoleColor.brightYellow);
   var answer = console.readLine(cancelOnBreak: true);
-  console.resetColorAttributes();
+  console.setForegroundColor(ConsoleColor.brightWhite);
   if (answer == 'n') {
     saveToFile(jsonEncode(listGames));
     return false;
@@ -139,4 +140,5 @@ void bye() {
   console.setForegroundColor(ConsoleColor.brightYellow);
   console.writeLine('Bye $namePlayer!');
   console.resetColorAttributes();
+  console.clearScreen();
 }
