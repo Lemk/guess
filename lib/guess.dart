@@ -137,8 +137,9 @@ bool attempt() {
 }
 
 void bye() {
+  console.resetColorAttributes();
+  console.clearScreen();
   console.setForegroundColor(ConsoleColor.brightYellow);
   console.writeLine('Bye $namePlayer!');
   console.resetColorAttributes();
-  console.clearScreen();
 }
